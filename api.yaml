@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Requests API
+  version: 1.0.0
+servers:
+  - url: http://requester.loc/rest
+paths:
+  /request/:
+    get:
+      summary: Получение списка заявок
+      description: Возвращает список заявок с возможностью фильтрации по статусу и датам.
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: Статус заявки
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date-time
+          description: Начальная дата фильтрации
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date-time
+          description: Конечная дата фильтрации
+        - in: header
+          name: X-Auth-Token
+          schema:
+            type: string
+            default: 'DJIefeiehH_Iwiekiiejf982%hjJJ'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Request'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /request:
+    post:
+      summary: Создание новой заявки
+      description: Создает новую заявку.
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          schema:
+            type: string
+            default: 'DJIefeiehH_Iwiekiiejf982%hjJJ'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestInput'
+      responses:
+        '201':
+          description: Заявка успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /request/{id}:
+    put:
+      summary: Обновление существующей заявки
+      description: Обновляет статус и ответ заявки.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-Auth-Token
+          schema:
+           type: string
+           default: 'DJIefeiehH_Iwiekiiejf982%hjJJ'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUpdate'
+      responses:
+        '200':
+          description: Заявка успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Заявка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  headers:
+    X-Auth-Token:
+      schema:
+        type: string
+        default: 'DJIefeiehH_Iwiekiiejf982%hjJJ'
+  schemas:
+    Request:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    RequestInput:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        message:
+          type: string
+    RequestUpdate:
+      type: object
+      properties:
+        comment:
+          type: string
+        response:
+          type: string
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          additionalProperties: {}
